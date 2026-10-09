@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SDL2;
 using Yafc.Core;
 using Yafc.I18n;
 using Yafc.Model;
@@ -135,6 +136,7 @@ public class NeverEnoughItemsPanel : PseudoScreen, IComparer<NeverEnoughItemsPan
                 SetItem(last);
                 history.RemoveRange(history.Count - 2, 2);
             }
+            return true;
         }
         return base.KeyDown(key);
     }
