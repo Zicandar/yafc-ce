@@ -4,7 +4,6 @@ using Yafc.Core;
 using Yafc.I18n;
 using Yafc.Model;
 using Yafc.UI;
-using SDL2;
 
 namespace Yafc;
 
@@ -15,9 +14,9 @@ public class NeverEnoughItemsPanel : PseudoScreen, IComparer<NeverEnoughItemsPan
     private float currentFlow;
     private EntryStatus showRecipesRange = EntryStatus.Normal;
 
-    //Recent is the list of Goods shown at the top of the window, and does not contain duplicates.
+    // Recent is the list of Goods shown at the top of the window, and does not contain duplicates.
     private readonly List<Goods> recent = [];
-    //History is the linear history of what Goods have been shown, except when backspace is used to navigate backwards through history.
+    // History is the linear history of what Goods have been shown, except when backspace is used to navigate backwards through history.
     private readonly List<Goods> history = [];
     private bool atCurrentMilestones;
 
@@ -102,7 +101,6 @@ public class NeverEnoughItemsPanel : PseudoScreen, IComparer<NeverEnoughItemsPan
             }
         }
 
-
         currentFlow = current.ApproximateFlow(atCurrentMilestones);
         RecipeEntry[] refreshedProductions = new RecipeEntry[current.production.Length];
         for (int i = 0; i < current.production.Length; i++) {
@@ -133,7 +131,7 @@ public class NeverEnoughItemsPanel : PseudoScreen, IComparer<NeverEnoughItemsPan
     public override bool KeyDown(SDL.SDL_Keysym key) {
         if (key.scancode == SDL.SDL_Scancode.SDL_SCANCODE_BACKSPACE && history.Count > 0) {
             var last = history[^1];
-            if (last != this.current) { //Don't remove history if item doesn't change, as items are not added to the history unless they change!
+            if (last != current) { //Don't remove history if item doesn't change, as items are not added to the history unless they change!
                 SetItem(last);
                 history.RemoveRange(history.Count - 2, 2);
             }
