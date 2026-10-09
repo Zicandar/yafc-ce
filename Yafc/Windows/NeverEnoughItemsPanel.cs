@@ -84,7 +84,8 @@ public class NeverEnoughItemsPanel : PseudoScreen, INavigationTarget, IComparer<
         Instance.SetItem(item);
     }
 
-    private void SetItem(Goods current) {
+    private void SetItem(Goods current) => SetItem(current, true);
+    private void SetItem(Goods current, bool recordHistory) {
         if (current == this.current) {
             return;
         }
@@ -96,9 +97,11 @@ public class NeverEnoughItemsPanel : PseudoScreen, INavigationTarget, IComparer<
 
         if (this.current != null) {
             recent.Add(this.current);
-            history.Add(this.current);
-            if (history.Count > 100) {
-                history.RemoveRange(0, 20);
+            if (recordHistory) {
+                history.Add(this.current);
+                if (history.Count > 100) {
+                    history.RemoveRange(0, 20);
+                }
             }
         }
 
@@ -127,7 +130,7 @@ public class NeverEnoughItemsPanel : PseudoScreen, INavigationTarget, IComparer<
     public void NavigateBack() {
         if (history.Count > 0) {
             var last = history[^1];
-            SetItem(last);
+            SetItem(last, false);
             history.RemoveAt(history.Count - 1);
         }
     }
