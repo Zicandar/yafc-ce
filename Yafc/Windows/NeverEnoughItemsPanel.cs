@@ -84,7 +84,8 @@ public class NeverEnoughItemsPanel : PseudoScreen, IComparer<NeverEnoughItemsPan
         Instance.SetItem(item);
     }
 
-    private void SetItem(Goods current) {
+    private void SetItem(Goods current) => SetItem(current, true);
+    private void SetItem(Goods current, bool recordHistory) {
         if (current == this.current) {
             return;
         }
@@ -96,9 +97,11 @@ public class NeverEnoughItemsPanel : PseudoScreen, IComparer<NeverEnoughItemsPan
 
         if (this.current != null) {
             recent.Add(this.current);
-            history.Add(this.current);
-            if (history.Count > 100) {
-                history.RemoveRange(0, 20);
+            if (recordHistory) {
+                history.Add(this.current);
+                if (history.Count > 100) {
+                    history.RemoveRange(0, 20);
+                }
             }
         }
 
@@ -124,19 +127,26 @@ public class NeverEnoughItemsPanel : PseudoScreen, IComparer<NeverEnoughItemsPan
         usageList.Rebuild();
     }
 
+    public virtual bool NavigateBack() {
+        if (history.Count > 0) {
+            var last = history[^1];
+            SetItem(last, false);
+            history.RemoveAt(history.Count - 1);
+            return true;
+        }
+        return false;
+    }
+
     /// <summary>
     /// Handle KeyDown event. 
     /// Allow for using backspace (or mouse button 4 / X1) to backtrack to whatever was viewed previously.
     /// Most of the code is similar to Yafc\Windows\DependencyExplorer.cs but with some additional checks due to the ability to navigate to the same item it's already on.
     /// </summary>
     public override bool KeyDown(SDL.SDL_Keysym key) {
-        if (key.scancode == SDL.SDL_Scancode.SDL_SCANCODE_BACKSPACE && history.Count > 0) {
-            var last = history[^1];
-            if (last != current) { //Don't remove history if item doesn't change, as items are not added to the history unless they change!
-                SetItem(last);
-                history.RemoveRange(history.Count - 2, 2);
+        if (key.scancode == SDL.SDL_Scancode.SDL_SCANCODE_BACKSPACE) {
+            if (NavigateBack()) {
+                return true;
             }
-            return true;
         }
         return base.KeyDown(key);
     }
