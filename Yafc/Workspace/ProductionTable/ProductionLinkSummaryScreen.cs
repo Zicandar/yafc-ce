@@ -10,7 +10,7 @@ using Yafc.UI;
 
 namespace Yafc;
 
-public class ProductionLinkSummaryScreen : PseudoScreen, IComparer<(RecipeRow row, float flow)> {
+public class ProductionLinkSummaryScreen : PseudoScreen, INavigationTarget, IComparer<(RecipeRow row, float flow)> {
     private readonly Stack<ProductionLink> links = new();
 
     private ProductionLink link;
