@@ -17,6 +17,11 @@ public interface IMouseFocus {
     void FocusChanged(bool focused);
 }
 
+// This is to be used for PsuedoScreen subtypes when they support Mouse 4 based backwards navigation.
+public interface INavigationTarget {
+    bool NavigateBack();
+}
+
 public sealed class InputSystem {
     public static readonly InputSystem Instance = new InputSystem();
 
@@ -150,6 +155,14 @@ public sealed class InputSystem {
             if (activeMouseFocus != null && !activeMouseFocus.FilterPanel(hoveringPanel)) {
                 SetMouseFocus(null);
             }
+        }
+
+        //Mouse button 4 (X1) is commonly used for backwards navigation.
+        //If this button is used, we do an early out to avoid treating it as a "normal" mouse click.
+        if (button == SDL.SDL_BUTTON_X1) {
+            _ = (defaultKeyboardFocus as INavigationTarget)?.NavigateBack();
+            //Early return, as it's not a "normal" mouse button
+            return;
         }
 
         mouseDownPosition = mousePosition;

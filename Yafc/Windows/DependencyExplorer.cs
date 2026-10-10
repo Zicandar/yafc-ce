@@ -7,7 +7,7 @@ using Yafc.UI;
 
 namespace Yafc;
 
-public class DependencyExplorer : PseudoScreen {
+public class DependencyExplorer : PseudoScreen, INavigationTarget {
     private readonly ScrollArea dependencies;
     private readonly ScrollArea dependents;
     private static readonly Padding listPad = new Padding(0.5f);
@@ -197,7 +197,7 @@ public class DependencyExplorer : PseudoScreen {
         if (history.Count > 0) {
             var last = history[^1];
             Change(last, false);
-            history.RemoveAt(history.Count -1);
+            history.RemoveAt(history.Count - 1);
             return true;
         }
         return false;
