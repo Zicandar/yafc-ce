@@ -139,8 +139,8 @@ public class NeverEnoughItemsPanel : PseudoScreen, IComparer<NeverEnoughItemsPan
 
     /// <summary>
     /// Handle KeyDown event. 
-    /// Allow for using backspace (or mouse button 4 / X1) to backtrack to whatever was viewed previously.
-    /// Most of the code is similar to Yafc\Windows\DependencyExplorer.cs but with some additional checks due to the ability to navigate to the same item it's already on.
+    /// Allow for using backspace to backtrack to whatever was viewed previously.
+    /// Most of the code is similar to Yafc\Windows\DependencyExplorer.cs.
     /// </summary>
     public override bool KeyDown(SDL.SDL_Keysym key) {
         if (key.scancode == SDL.SDL_Scancode.SDL_SCANCODE_BACKSPACE) {
