@@ -127,14 +127,12 @@ public class NeverEnoughItemsPanel : PseudoScreen, IComparer<NeverEnoughItemsPan
         usageList.Rebuild();
     }
 
-    public virtual bool NavigateBack() {
+    public void NavigateBack() {
         if (history.Count > 0) {
             var last = history[^1];
             SetItem(last, false);
             history.RemoveAt(history.Count - 1);
-            return true;
         }
-        return false;
     }
 
     /// <summary>
@@ -144,9 +142,8 @@ public class NeverEnoughItemsPanel : PseudoScreen, IComparer<NeverEnoughItemsPan
     /// </summary>
     public override bool KeyDown(SDL.SDL_Keysym key) {
         if (key.scancode == SDL.SDL_Scancode.SDL_SCANCODE_BACKSPACE) {
-            if (NavigateBack()) {
-                return true;
-            }
+            NavigateBack();
+            return true;
         }
         return base.KeyDown(key);
     }
