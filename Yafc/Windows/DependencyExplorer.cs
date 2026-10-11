@@ -193,14 +193,12 @@ public class DependencyExplorer : PseudoScreen, INavigationTarget {
         Rebuild();
     }
 
-    public virtual bool NavigateBack() {
+    public void NavigateBack() {
         if (history.Count > 0) {
             var last = history[^1];
             Change(last, false);
             history.RemoveAt(history.Count - 1);
-            return true;
         }
-        return false;
     }
 
     public override bool KeyDown(SDL.SDL_Keysym key) {

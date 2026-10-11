@@ -19,7 +19,7 @@ public interface IMouseFocus {
 
 // This is to be used for PsuedoScreen subtypes when they support Mouse 4 based backwards navigation.
 public interface INavigationTarget {
-    bool NavigateBack();
+    void NavigateBack();
 }
 
 public sealed class InputSystem {
