@@ -12,6 +12,7 @@ namespace Yafc;
 
 public class ProductionLinkSummaryScreen : PseudoScreen, INavigationTarget, IComparer<(RecipeRow row, float flow)> {
     private readonly Stack<ProductionLink> links = new();
+    private readonly Stack<ProductionLink> linksForward = new();
 
     private ProductionLink link;
     private List<(RecipeRow row, float flow)> input;
@@ -206,6 +207,8 @@ public class ProductionLinkSummaryScreen : PseudoScreen, INavigationTarget, ICom
 
         void changeLinkView(ProductionLink newLink) {
             links.Push(link);
+            // When we record new history, we throw away navigateForward information. Similar to undo/redo works.
+            linksForward.Clear();
             CalculateFlow(newLink);
         }
     }
@@ -253,13 +256,34 @@ public class ProductionLinkSummaryScreen : PseudoScreen, INavigationTarget, ICom
 
     public void NavigateBack() {
         if (links.Count > 0) {
-            CalculateFlow(links.Pop());
+            var last = links.Pop();
+            linksForward.Push(link);
+            CalculateFlow(last);
         }
     }
 
+    public void NavigateForward() {
+        if (linksForward.Count > 0) {
+            var next = linksForward.Pop();
+            links.Push(link);
+            CalculateFlow(next);
+        }
+    }
+
+    /// <summary>
+    /// Handle KeyDown event. 
+    /// Allow for using backspace to backtrack to whatever was viewed previously.
+    /// And shift + backspace to go "forward" from previous backtracking.
+    /// Most of the code is identical to NeverEnoughItemsPanel and DependencyExplorer.
+    /// </summary>
     public override bool KeyDown(SDL.SDL_Keysym key) {
         if (key.scancode is SDL.SDL_Scancode.SDL_SCANCODE_BACKSPACE or SDL.SDL_Scancode.SDL_SCANCODE_KP_BACKSPACE) {
-            NavigateBack();
+            if ((key.mod & SDL.SDL_Keymod.KMOD_SHIFT) != 0) {
+                NavigateForward();
+            }
+            else {
+                NavigateBack();
+            }
             return true;
         }
         return base.KeyDown(key);
