@@ -17,9 +17,10 @@ public interface IMouseFocus {
     void FocusChanged(bool focused);
 }
 
-// INavigationTarget exists to support Mouse 4 (AKA X1) based navigation of cases where defaultKeyboardFocus is set to an object that implements this interface.
+// INavigationTarget exists to support Mouse 4 and 5 (AKA X1 and X2) based navigation of cases where defaultKeyboardFocus is set to an object that implements this interface.
 public interface INavigationTarget {
     void NavigateBack();
+    void NavigateForward();
 }
 
 public sealed class InputSystem {
@@ -161,6 +162,12 @@ public sealed class InputSystem {
         // If this button is used, we do an early out to avoid treating it as a "normal" mouse click.
         if (button == SDL.SDL_BUTTON_X1) {
             (defaultKeyboardFocus as INavigationTarget)?.NavigateBack();
+            return;
+        }
+        // Mouse button 5 (X2) is commonly used for forwards navigation.
+        // If this button is used, we do an early out to avoid treating it as a "normal" mouse click.
+        if (button == SDL.SDL_BUTTON_X2) {
+            (defaultKeyboardFocus as INavigationTarget)?.NavigateForward();
             return;
         }
 
