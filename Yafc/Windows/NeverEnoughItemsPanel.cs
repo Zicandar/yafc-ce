@@ -19,6 +19,7 @@ public class NeverEnoughItemsPanel : PseudoScreen, INavigationTarget, IComparer<
     private readonly List<Goods> recent = [];
     // History is the linear history of what Goods have been shown, except when backspace is used to navigate backwards through history.
     private readonly List<Goods> history = [];
+    private readonly List<Goods> forwardHistory = [];
     private bool atCurrentMilestones;
 
     private readonly ScrollArea productionList;
@@ -98,6 +99,8 @@ public class NeverEnoughItemsPanel : PseudoScreen, INavigationTarget, IComparer<
         if (this.current != null) {
             recent.Add(this.current);
             if (recordHistory) {
+                // When we record new history, we throw away navigateForward information. Similar to undo/redo works.
+                forwardHistory.Clear();
                 history.Add(this.current);
                 if (history.Count > 100) {
                     history.RemoveRange(0, 20);
@@ -129,20 +132,36 @@ public class NeverEnoughItemsPanel : PseudoScreen, INavigationTarget, IComparer<
 
     public void NavigateBack() {
         if (history.Count > 0) {
+            forwardHistory.Add(current);
             var last = history[^1];
             SetItem(last, false);
             history.RemoveAt(history.Count - 1);
         }
     }
 
+    public void NavigateForward() {
+        if (forwardHistory.Count > 0) {
+            history.Add(current);
+            var next = forwardHistory[^1];
+            SetItem(next, false);
+            forwardHistory.RemoveAt(forwardHistory.Count - 1);
+        }
+    }
+
     /// <summary>
     /// Handle KeyDown event. 
     /// Allow for using backspace to backtrack to whatever was viewed previously.
-    /// Most of the code is similar to Yafc\Windows\DependencyExplorer.cs.
+    /// And shift + backspace to go "forward" from previous backtracking.
+    /// Most of the code is identical to DependencyExplorer and ProductionLinkSummaryScreen.
     /// </summary>
     public override bool KeyDown(SDL.SDL_Keysym key) {
         if (key.scancode is SDL.SDL_Scancode.SDL_SCANCODE_BACKSPACE or SDL.SDL_Scancode.SDL_SCANCODE_KP_BACKSPACE) {
-            NavigateBack();
+            if ((key.mod & SDL.SDL_Keymod.KMOD_SHIFT) != 0) {
+                NavigateForward();
+            }
+            else {
+                NavigateBack();
+            }
             return true;
         }
         return base.KeyDown(key);
