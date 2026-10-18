@@ -13,6 +13,7 @@ public class DependencyExplorer : PseudoScreen, INavigationTarget {
     private static readonly Padding listPad = new Padding(0.5f);
 
     private readonly List<FactorioObject> history = [];
+    private readonly List<FactorioObject> forwardHistory = [];
     private FactorioObject current;
 
     private static readonly Dictionary<DependencyNode.Flags, (LocalizableString1? name, LocalizableString0 missingText)> dependencyListTexts = new()
@@ -181,6 +182,8 @@ public class DependencyExplorer : PseudoScreen, INavigationTarget {
     public void Change(FactorioObject target) => Change(target, true);
     public void Change(FactorioObject target, bool recordHistory) {
         if (recordHistory) {
+            // When we record new history, we throw away navigateForward information. Similar to undo/redo works.
+            forwardHistory.Clear();
             history.Add(current);
             if (history.Count > 100) {
                 history.RemoveRange(0, 20);
@@ -195,15 +198,37 @@ public class DependencyExplorer : PseudoScreen, INavigationTarget {
 
     public void NavigateBack() {
         if (history.Count > 0) {
+            forwardHistory.Add(current);
             var last = history[^1];
             Change(last, false);
             history.RemoveAt(history.Count - 1);
         }
     }
 
+    public void NavigateForward() {
+        if (forwardHistory.Count > 0) {
+            history.Add(current);
+            var next = forwardHistory[^1];
+            Change(next, false);
+            forwardHistory.RemoveAt(forwardHistory.Count - 1);
+        }
+    }
+
+
+    /// <summary>
+    /// Handle KeyDown event. 
+    /// Allow for using backspace to backtrack to whatever was viewed previously.
+    /// And shift + backspace to go "forward" from previous backtracking.
+    /// Most of the code is identical to NeverEnoughItemsPanel and ProductionLinkSummaryScreen.
+    /// </summary>
     public override bool KeyDown(SDL.SDL_Keysym key) {
         if (key.scancode is SDL.SDL_Scancode.SDL_SCANCODE_BACKSPACE or SDL.SDL_Scancode.SDL_SCANCODE_KP_BACKSPACE) {
-            NavigateBack();
+            if ((key.mod & SDL.SDL_Keymod.KMOD_SHIFT) != 0) {
+                NavigateForward();
+            }
+            else {
+                NavigateBack();
+            }
             return true;
         }
         return base.KeyDown(key);
