@@ -10,6 +10,7 @@ using Yafc.UI;
 
 namespace Yafc;
 
+// This is the "Summary View", different from "Summary (Legacy)" view, that can be found at Yafc/Workspace/ProductionSummary/ProductionSummaryView.cs
 public class SummaryView : ProjectPageView<Summary> {
     /// <summary>Height of each row</summary>
     private float rowHeight;
