@@ -14,8 +14,7 @@ public class SearchableList<TData>(float height, Vector2 elementSize, VirtualScr
 
     private readonly Filter filterFunc = filter;
 
-    // TODO (https://github.com/Yafc-CE/yafc-ce/issues/293) investigate set()
-    public new IEnumerable<TData> data {
+    public new IReadOnlyList<TData> data {
         get;
         set {
             field = value ?? [];
