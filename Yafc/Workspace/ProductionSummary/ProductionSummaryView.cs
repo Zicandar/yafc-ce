@@ -7,6 +7,7 @@ using Yafc.UI;
 
 namespace Yafc;
 
+// This is the Summary (Legacy) view. For the new view, see Yafc/Workspace/SummaryView.cs
 public class ProductionSummaryView : ProjectPageView<ProductionSummary> {
     private readonly DataGrid<ProductionSummaryEntry> grid;
     private readonly FlatHierarchy<ProductionSummaryEntry, ProductionSummaryGroup> flatHierarchy;
